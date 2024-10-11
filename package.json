@@ -1,0 +1,17 @@
+{
+  "name": "capital_gains_project",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "ts-node src/capital_gains.ts",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.13",
+    "@types/node": "^22.7.5",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^4.0.0"
+  },
+  "license": "MIT"
+}
