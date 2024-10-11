@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 # Ganho de Capital - Desafio Técnico Nubank
 
@@ -88,3 +89,4 @@ O projeto está estruturado da seguinte forma:
 - O programa não depende de banco de dados externo.
 - Arredondamento dos números decimais deve ser feito para duas casas.
 - O estado do programa é gerenciado em memória e resetado a cada execução.
+=======
