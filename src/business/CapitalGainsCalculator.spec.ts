@@ -1,12 +1,12 @@
 import { CapitalGainsCalculator } from './CapitalGainsCalculator'
 import { ExemptTaxStrategy } from '../tax/ExemptTaxStrategy'
-import { Operation } from '../types/Operation'
+import { TradeOperation } from '../types/Operation'
 
 describe('CapitalGainsCalculator', () => {
   let calculator: CapitalGainsCalculator
 
-  const buyOperation: Operation = {
-    type: 'buy',
+  const buyOperation: TradeOperation = {
+    operation: 'buy',
     quantity: 100,
     unitCost: 10
   }
@@ -22,8 +22,8 @@ describe('CapitalGainsCalculator', () => {
   })
 
   it('should throw an error if selling more shares than available', () => {
-    const sellOperation: Operation = {
-      type: 'sell',
+    const sellOperation: TradeOperation = {
+      operation: 'sell',
       quantity: 200,
       unitCost: 15
     }
@@ -35,8 +35,8 @@ describe('CapitalGainsCalculator', () => {
   })
 
   it('should calculate zero tax for sales below the exemption limit', () => {
-    const sellOperation: Operation = {
-      type: 'sell',
+    const sellOperation: TradeOperation = {
+      operation: 'sell',
       quantity: 50,
       unitCost: 15
     }
@@ -47,8 +47,8 @@ describe('CapitalGainsCalculator', () => {
   })
 
   it('should accumulate loss after a sell operation with negative profit', () => {
-    const sellOperation: Operation = {
-      type: 'sell',
+    const sellOperation: TradeOperation = {
+      operation: 'sell',
       quantity: 100,
       unitCost: 15
     }

@@ -1,12 +1,12 @@
-import { Operation } from "../types/Operation"
+import { TradeOperation } from "../types/Operation"
 
-export class BuyOperation implements Operation {
-  type: 'buy'
-  quantity: number
-  unitCost: number
+export class BuyOperation implements TradeOperation {
+  public readonly operation: 'buy'
+  public readonly quantity: number
+  public readonly unitCost: number
 
   constructor(quantity: number, unitCost: number) {
-    this.type = 'buy'
+    this.operation = 'buy'
     this.quantity = quantity
     this.unitCost = unitCost
   }

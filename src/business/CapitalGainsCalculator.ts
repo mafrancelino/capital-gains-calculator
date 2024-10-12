@@ -1,6 +1,6 @@
 import { ExemptTaxStrategy } from '../tax/ExemptTaxStrategy'
 import { TaxStrategy } from '../tax/TaxStrategy'
-import { Operation } from '../types/Operation'
+import { TradeOperation } from '../types/Operation'
 
 interface TaxResult {
   tax: number
@@ -16,8 +16,8 @@ export class CapitalGainsCalculator {
     this.taxStrategy = taxStrategy
   }
 
-  public handleOperation(operation: Operation): TaxResult {
-    switch (operation.type) {
+  public handleOperation(operation: TradeOperation): TaxResult {
+    switch (operation.operation) {
       case 'buy':
         return this.handleBuyOperation(operation)
       case 'sell':
@@ -27,13 +27,13 @@ export class CapitalGainsCalculator {
     }
   }
 
-  private handleBuyOperation(operation: Operation): TaxResult {
+  private handleBuyOperation(operation: TradeOperation): TaxResult {
     this.updateWeightedAverageCost(operation)
     this.totalShares += operation.quantity
     return { tax: 0 }
   }
 
-  private updateWeightedAverageCost(operation: Operation): void {
+  private updateWeightedAverageCost(operation: TradeOperation): void {
     const totalCostOfCurrentShares = this.weightedAverageCostPerShare * this.totalShares
     const totalCostOfNewShares = operation.unitCost * operation.quantity
     const totalSharesAfterPurchase = this.totalShares + operation.quantity
@@ -41,7 +41,7 @@ export class CapitalGainsCalculator {
     this.weightedAverageCostPerShare = (totalCostOfCurrentShares + totalCostOfNewShares) / totalSharesAfterPurchase
   }
 
-  private handleSellOperation(operation: Operation): TaxResult {
+  private handleSellOperation(operation: TradeOperation): TaxResult {
     this.verifySufficientShares(operation.quantity)
 
     const grossProfit = this.calculateGrossProfit(operation)
@@ -55,7 +55,7 @@ export class CapitalGainsCalculator {
 
   private verifySufficientShares(quantity: number): void {
     if (this.totalShares < quantity) {
-      throw new Error(`Quantidade insuficiente de ações. Tentativa de venda: ${quantity}, disponível: ${this.totalShares}`)
+      throw new Error(`Insufficient quantity of shares. Attempted to sell: ${quantity}, available: ${this.totalShares}`)
     }
   }
 
@@ -63,7 +63,7 @@ export class CapitalGainsCalculator {
     this.totalShares -= quantity
   }
 
-  private calculateGrossProfit(operation: Operation): number {
+  private calculateGrossProfit(operation: TradeOperation): number {
     return (operation.unitCost - this.weightedAverageCostPerShare) * operation.quantity
   }
 
@@ -90,7 +90,7 @@ export class CapitalGainsCalculator {
     this.accumulatedLosses += Math.abs(loss)
   }
 
-  private computeTaxIfApplicable(netProfit: number, operation: Operation): number {
+  private computeTaxIfApplicable(netProfit: number, operation: TradeOperation): number {
     const totalSaleValue = operation.unitCost * operation.quantity
 
     if (totalSaleValue <= 20000) {

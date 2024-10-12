@@ -1,5 +1,5 @@
-export interface Operation {
-    type: 'buy' | 'sell'
+export interface TradeOperation {
+    operation: 'buy' | 'sell'
     quantity: number
     unitCost: number
   }
