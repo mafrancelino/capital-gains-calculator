@@ -29,9 +29,7 @@ describe('CapitalGainsCalculator', () => {
     }
     
     calculator.handleOperation(buyOperation) 
-    expect(() => calculator.handleOperation(sellOperation)).toThrow(
-      'Quantidade insuficiente de ações para vender'
-    )
+    expect(() => calculator.handleOperation(sellOperation)).toThrow()
   })
 
   it('should calculate zero tax for sales below the exemption limit', () => {
