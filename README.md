@@ -76,3 +76,14 @@ Além disso, o projeto aplica **transparência referencial** através do uso de 
 O sistema foi projetado para ser **modular** e facilmente extensível. O uso de interfaces para operações de trade (`TradeOperation`) e estratégias de taxação (`TaxStrategy`) permite a adição de novos tipos de operações ou regras fiscais com alterações mínimas no código existente. Isso garante que o sistema possa crescer e se adaptar a novos requisitos sem impactar significativamente a arquitetura atual.
 
 Essa modularidade também suporta **escalabilidade**. À medida que o sistema evolui, diferentes componentes, como as estratégias fiscais ou o processamento de entrada, podem ser substituídos ou otimizados de forma independente, permitindo a adição de novas funcionalidades com baixo impacto no restante do sistema.
+
+###### Padrões Arquiteturais Usados
+
+Strategy Pattern (Padrão de Estratégia):
+O cálculo do imposto sobre ganhos de capital utiliza o padrão Strategy para separar a lógica de taxação do restante do sistema. Existem diferentes regras de tributação, como isenção para vendas abaixo de R$ 20.000,00 e a aplicação de uma alíquota padrão de 20% para lucros acima desse valor. Essas regras são implementadas em classes como ExemptTaxStrategy e SimpleTaxStrategy. Isso torna o sistema flexível e permite que novas estratégias de taxação sejam adicionadas no futuro sem modificar o código existente.
+
+Factory Pattern (Padrão de Fábrica):
+O Factory Pattern é usado para criar instâncias das operações de trade (BuyOperation e SellOperation). Isso permite que o sistema crie dinamicamente os objetos corretos de operação, com base nos dados de entrada. Dessa forma, o código fica mais flexível e desacoplado, já que a criação de novos tipos de operação (como ShortSellOperation, por exemplo) pode ser facilmente incorporada ao sistema sem impactar outras partes do código.
+
+Command Pattern (Padrão de Comando - Implícito):
+O sistema segue, de maneira implícita, o Command Pattern, pois trata cada operação de trade (como compra ou venda) como um comando que pode ser executado. As operações possuem o método execute, que encapsula a lógica de execução de cada tipo de operação. Esse padrão pode ser estendido para incluir recursos adicionais, como desfazer ou refazer operações, caso o sistema precise evoluir nesse sentido.
