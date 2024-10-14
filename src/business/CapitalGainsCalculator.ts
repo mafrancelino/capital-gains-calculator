@@ -14,9 +14,16 @@ export class CapitalGainsCalculator {
   }
 
   public handleOperations(trades: TradeOperation[]): TaxResult[] {
-    return trades.map(trade => this.handleTrade(trade))
+    const transformedTrades = trades.map(trade => ({
+      ...trade,
+      unitCost: trade['unit-cost'] || trade.unitCost, 
+      quantity: trade.quantity,
+      operation: trade.operation,
+    }))
+  
+    return transformedTrades.map(trade => this.handleTrade(trade))
   }
-
+  
   private handleTrade(trade: TradeOperation): TaxResult {
     switch (trade.operation) {
       case 'buy':
@@ -33,31 +40,30 @@ export class CapitalGainsCalculator {
       this.totalShares,
       this.weightedAverageCostPerShare,
       trade.quantity,
-      trade['unit-cost']
+      trade.unitCost
     )
     this.totalShares += trade.quantity
     return { tax: 0 }
   }
 
   private handleSellTrade(trade: TradeOperation): TaxResult {
-    this.verifySufficientShares(trade.quantity)
-
+    this.verifySufficientShares(trade.quantity);
+  
     const grossProfit = calculateGrossProfit(
-      trade['unit-cost'],
+      trade.unitCost,
       this.weightedAverageCostPerShare,
       trade.quantity
     )
 
-    const { netProfit, remainingLosses } = applyAccumulatedLosses(grossProfit, this.accumulatedLosses)
-    this.accumulatedLosses = remainingLosses
-
-    const tax = this.computeTaxIfApplicable(netProfit, trade)
-
-    this.reduceSharesAfterSale(trade.quantity)
-
-    return { tax }
+    const { netProfit, remainingLosses } = applyAccumulatedLosses(grossProfit, this.accumulatedLosses);
+    this.accumulatedLosses = remainingLosses;
+  
+    const tax = this.computeTaxIfApplicable(netProfit, trade);
+  
+    this.reduceSharesAfterSale(trade.quantity);
+    return { tax };
   }
-
+  
   private verifySufficientShares(quantity: number): void {
     if (this.totalShares < quantity) {
       throw new Error(`Insufficient shares. Attempt to sell ${quantity}, available: ${this.totalShares}`)
