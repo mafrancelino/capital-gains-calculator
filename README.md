@@ -1,11 +1,12 @@
-<<<<<<< HEAD
 
-# Ganho de Capital - Desafio Técnico Nubank
+# Calculadora de Ganho de Capital - Desafio Técnico Nubank
 
 ## Visão Geral
+
 Este projeto implementa uma aplicação de linha de comando (CLI) que calcula o imposto sobre ganhos de capital em operações de compra e venda de ações no mercado financeiro. A aplicação lê operações no formato JSON e retorna o imposto calculado para cada operação de venda.
 
 ## Regras de Negócio
+
 O cálculo do imposto sobre ganhos de capital segue as seguintes regras:
 
 - O imposto é de 20% sobre o lucro obtido em operações de venda, desde que o valor total da venda exceda R$ 20.000,00.
@@ -22,71 +23,56 @@ Exemplo de operação:
 ```
 
 Resultado:
+
 ```json
 [{"tax": 0.00}, {"tax": 10000.00}]
 ```
 
-## Instalação
-Para rodar este projeto, siga as instruções abaixo:
+## Como Instalar
 
-1. Clone o repositório:
+### Pré-requisitos
+
+1. **Node.js**: O projeto requer que você tenha o Node.js instalado na sua máquina. Caso ainda não o tenha, faça o download e instale a partir do [site oficial do Node.js](https://nodejs.org/).
+
+2. **Yarn**: O projeto utiliza o gerenciador de pacotes Yarn. Para instalar o Yarn, execute o seguinte comando:
+
    ```bash
-   git clone https://github.com/seu-usuario/ganho-de-capital.git
-   cd ganho-de-capital
+   npm install -g yarn
    ```
 
-2. Instale as dependências utilizando o Yarn ou npm:
+### Instalação do Projeto
+
+Para rodar este projeto, siga os passos abaixo:
+
+1. Instale as dependências utilizando o Yarn:
+
    ```bash
    yarn install
    ```
 
-## Como Executar o Projeto
+2. Para executar a aplicação e processar as operações de compra e venda:
 
-1. Para executar a aplicação e processar as operações de compra e venda:
    ```bash
-   yarn start
+   yarn start < input.txt
    ```
 
-2. O arquivo `input.txt` deve conter as operações em formato JSON, uma operação por linha.
+## Como Executar os Testes
 
-## Executando os Testes
-
-Para rodar os testes automatizados:
+Para rodar os testes automatizados, utilize o seguinte comando:
 
 ```bash
 yarn test
 ```
+## Decisões Técnicas e Arquiteturais
 
-Para gerar um relatório de cobertura de testes:
-```bash
-yarn test --coverage
-```
+### Design Orientado a Objetos e Transparência Referencial
 
-## Estrutura do Projeto
-O projeto está estruturado da seguinte forma:
+Este projeto segue um design **orientado a objetos**, com foco em modularidade e facilidade de manutenção. Cada componente do sistema (por exemplo, as estratégias de cálculo de imposto e as operações de compra e venda) é encapsulado em classes com responsabilidades bem definidas. Essa separação de responsabilidades facilita a manutenção, testes e extensão do código.
 
-- **src/business**: Contém a lógica principal da calculadora de ganho de capital.
-  - `CapitalGainsCalculator.ts`: Classe responsável pelo cálculo do imposto de ganho de capital.
-  
-- **src/input**: Contém o manipulador de entrada de dados.
-  - `InputHandler.ts`: Responsável por processar as operações de entrada.
+Além disso, o projeto aplica **transparência referencial** através do uso de funções puras em cálculos essenciais, como `calculateGrossProfit` e `calculateNewWeightedAverageCost`. Essas funções são livres de efeitos colaterais, garantindo que o mesmo resultado seja sempre retornado para as mesmas entradas. Isso torna o sistema mais previsível e fácil de testar.
 
-- **src/operations**: Implementa as diferentes operações de compra e venda.
-  - `BuyOperation.ts`: Classe que representa a operação de compra.
-  - `SellOperation.ts`: Classe que representa a operação de venda.
+### Sistema Modular e Escalável
 
-- **src/output**: Formata os resultados.
-  - `OutputFormatter.ts`: Responsável por gerar a saída formatada.
+O sistema foi projetado para ser **modular** e facilmente extensível. O uso de interfaces para operações de trade (`TradeOperation`) e estratégias de taxação (`TaxStrategy`) permite a adição de novos tipos de operações ou regras fiscais com alterações mínimas no código existente. Isso garante que o sistema possa crescer e se adaptar a novos requisitos sem impactar significativamente a arquitetura atual.
 
-- **src/tax**: Contém as estratégias de cálculo de imposto.
-  - `ExemptTaxStrategy.ts`: Calcula a isenção de impostos para vendas abaixo de R$ 20.000,00.
-  - `SimpleTaxStrategy.ts`: Calcula o imposto padrão de 20%.
-
-- **src/types**: Definições de tipos e interfaces.
-  - `Operation.ts`: Define o tipo para operações de compra e venda.
-
-## Notas Adicionais
-- O programa não depende de banco de dados externo.
-- Arredondamento dos números decimais deve ser feito para duas casas.
-- O estado do programa é gerenciado em memória e resetado a cada execução.
-=======
+Essa modularidade também suporta **escalabilidade**. À medida que o sistema evolui, diferentes componentes, como as estratégias fiscais ou o processamento de entrada, podem ser substituídos ou otimizados de forma independente, permitindo a adição de novas funcionalidades com baixo impacto no restante do sistema.
