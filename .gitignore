@@ -1,8 +1,4 @@
-# Dependências do Node.js
 node_modules/
-
-# Arquivos compilados pelo TypeScript
 dist/
-
-# Arquivos de log
 *.log
+yarn.lock
