@@ -14,7 +14,8 @@ export class BuyOperation implements TradeOperation {
 
   execute(currentQuantity: number, currentAverageCost: number): { newQuantity: number, newAverageCost: number } {
     const newAverageCost = calculateNewWeightedAverageCost(currentQuantity, currentAverageCost, this.quantity, this.unitCost)
+    const roundedAverageCost = Math.round(newAverageCost * 100) / 100  // Arredonda para 2 casas decimais
     const newQuantity = currentQuantity + this.quantity
-    return { newQuantity, newAverageCost }
+    return { newQuantity, newAverageCost: roundedAverageCost }
   }
 }

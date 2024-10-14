@@ -1,4 +1,4 @@
-import { TradeOperation } from '../types/Operation';
+import { TradeOperation } from '../types/Operation'
 
 export class OperationFactory {
   static create(operation: TradeOperation): TradeOperation {

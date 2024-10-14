@@ -23,6 +23,8 @@ export class CapitalGainsCalculator {
         return this.handleBuyTrade(trade)
       case 'sell':
         return this.handleSellTrade(trade)
+      default:
+        throw new Error('Invalid trade operation')
     }
   }
 
@@ -34,7 +36,6 @@ export class CapitalGainsCalculator {
       trade['unit-cost']
     )
     this.totalShares += trade.quantity
-
     return { tax: 0 }
   }
 
@@ -69,9 +70,12 @@ export class CapitalGainsCalculator {
 
   private computeTaxIfApplicable(netProfit: number, trade: TradeOperation): number {
     const totalSaleValue = trade['unit-cost'] * trade.quantity
+    
     if (totalSaleValue <= 20000) {
-      return 0
+        return 0
     }
-    return this.taxStrategy.calculateTax(netProfit, totalSaleValue)
+
+    const tax = netProfit > 0 ? netProfit * 0.20 : 0
+    return tax
   }
 }

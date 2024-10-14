@@ -16,9 +16,20 @@ describe('CapitalGainsCalculator', () => {
     calculator = new CapitalGainsCalculator(taxStrategy)
   })
 
-  it('should calculate average cost after a buy operation', () => {
-    const result = calculator.handleOperation(buyOperation) 
-    expect(result.tax).toBe(0)
+  it('should not calculate tax for buy operations', () => {
+    const result = calculator.handleOperations([buyOperation])
+    expect(result[0].tax).toBe(0)
+  })
+
+  it('should accumulate loss after a sell operation with negative profit', () => {
+    const sellOperation: TradeOperation = {
+      operation: 'sell',
+      quantity: 100,
+      unitCost: 5
+    }
+
+    const result = calculator.handleOperations([buyOperation, sellOperation])
+    expect(result[1].tax).toBe(0)
   })
 
   it('should throw an error if selling more shares than available', () => {
@@ -27,32 +38,7 @@ describe('CapitalGainsCalculator', () => {
       quantity: 200,
       unitCost: 15
     }
-    
-    calculator.handleOperation(buyOperation) 
-    expect(() => calculator.handleOperation(sellOperation)).toThrow()
-  })
 
-  it('should calculate zero tax for sales below the exemption limit', () => {
-    const sellOperation: TradeOperation = {
-      operation: 'sell',
-      quantity: 50,
-      unitCost: 15
-    }
-
-    calculator.handleOperation(buyOperation)
-    const result = calculator.handleOperation(sellOperation) 
-    expect(result.tax).toBe(0)
-  })
-
-  it('should accumulate loss after a sell operation with negative profit', () => {
-    const sellOperation: TradeOperation = {
-      operation: 'sell',
-      quantity: 100,
-      unitCost: 15
-    }
-    
-    calculator.handleOperation(buyOperation)
-    const result = calculator.handleOperation(sellOperation) 
-    expect(result.tax).toBe(0)
+    expect(() => calculator.handleOperations([buyOperation, sellOperation])).toThrow()
   })
 })

@@ -4,11 +4,13 @@ export function calculateNewWeightedAverageCost(
     newShares: number,
     newUnitCost: number
 ): number {
-    const totalCurrentCost = currentShares * currentWeightedCost;
-    const totalNewCost = newShares * newUnitCost;
-    const totalShares = currentShares + newShares;
+    const totalCurrentCost = currentShares * currentWeightedCost
+    const totalNewCost = newShares * newUnitCost
+    const totalShares = currentShares + newShares
 
-    return (totalCurrentCost + totalNewCost) / totalShares;
+    const newAverageCost = (totalCurrentCost + totalNewCost) / totalShares
+    // Round to two decimal places
+    return Math.round((newAverageCost + Number.EPSILON) * 100) / 100
 }
 
 export function calculateGrossProfit(
@@ -16,18 +18,20 @@ export function calculateGrossProfit(
     weightedAverageCost: number,
     quantity: number
 ): number {
-    return (unitCost - weightedAverageCost) * quantity;
+    const grossProfit = (unitCost - weightedAverageCost) * quantity
+    // Round to two decimal places
+    return Math.round((grossProfit + Number.EPSILON) * 100) / 100
 }
 
 export function applyAccumulatedLosses(
     grossProfit: number,
     accumulatedLosses: number
-): { netProfit: number, remainingLosses: number } {
-    const adjustedProfit = grossProfit - accumulatedLosses;
+): { netProfit: number; remainingLosses: number } {
+    const adjustedProfit = grossProfit - accumulatedLosses
 
     if (adjustedProfit < 0) {
-        return { netProfit: 0, remainingLosses: Math.abs(adjustedProfit) };
+        return { netProfit: 0, remainingLosses: Math.abs(adjustedProfit) }
     }
 
-    return { netProfit: adjustedProfit, remainingLosses: 0 };
+    return { netProfit: adjustedProfit, remainingLosses: 0 }
 }
