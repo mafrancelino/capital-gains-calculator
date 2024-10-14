@@ -1,6 +1,5 @@
 import { CapitalGainsCalculator } from "./business/CapitalGainsCalculator"
 import { InputHandler } from "./input/InputHandler"
-import OutputFormatter from "./output/OutputFormatter"
 
 async function main() {
   const inputHandler = new InputHandler()
@@ -11,7 +10,7 @@ async function main() {
     const results = calculator.handleOperations(operations)
 
     const formattedResults = results.map(result => ({ tax: parseFloat(result.tax.toFixed(2)) }))
-    console.log(OutputFormatter.format(formattedResults))  
+    console.log(JSON.stringify(formattedResults))
   })
 }
 
