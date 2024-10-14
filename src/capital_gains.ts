@@ -1,23 +1,18 @@
 import { CapitalGainsCalculator } from "./business/CapitalGainsCalculator"
 import { InputHandler } from "./input/InputHandler"
+import OutputFormatter from "./output/OutputFormatter"
 
 async function main() {
+  const inputHandler = new InputHandler()
+  const operations = await inputHandler.readInput()
+
+  operations.forEach(operations => {
     const calculator = new CapitalGainsCalculator()
+    const results = calculator.handleOperations(operations)
 
-    try {
-        const operations = await InputHandler.readInput()
-
-        for (const operation of operations) {
-            try {
-                const result = calculator.handleOperation(operation)
-                console.log(result)
-            } catch (error) {
-                console.error('Erro ao processar operação:', error.message)
-            }
-        }
-    } catch (error) {
-        console.error('Erro na leitura de operações:', error.message)
-    }
+    const formattedResults = results.map(result => ({ tax: parseFloat(result.tax.toFixed(2)) }))
+    console.log(OutputFormatter.format(formattedResults))  
+  })
 }
 
 main()

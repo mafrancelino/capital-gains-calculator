@@ -1,16 +1,13 @@
 export class InputHandler {
-  static async readInput(): Promise<any[]> {
+  async readInput(): Promise<any[]> {
     let inputData = ''
-    
+
     for await (const chunk of process.stdin) {
       inputData += chunk
     }
 
-    try {
-      const operations = JSON.parse(inputData.trim())
-      return operations
-    } catch (error) {
-      throw new Error('Invalid input format')
-    }
+    const blocks = inputData.trim().match(/\[.*?\]/gs) || []
+
+    return blocks.map((block: string) => JSON.parse(block))
   }
 }

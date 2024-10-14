@@ -1,4 +1,5 @@
 import { TradeOperation } from "../types/Operation"
+import { calculateNewWeightedAverageCost } from "../utils/tradeCalculations"
 
 export class BuyOperation implements TradeOperation {
   public readonly operation: 'buy'
@@ -12,9 +13,8 @@ export class BuyOperation implements TradeOperation {
   }
 
   execute(currentQuantity: number, currentAverageCost: number): { newQuantity: number, newAverageCost: number } {
-    const totalCost = (currentAverageCost * currentQuantity) + (this.unitCost * this.quantity)
+    const newAverageCost = calculateNewWeightedAverageCost(currentQuantity, currentAverageCost, this.quantity, this.unitCost)
     const newQuantity = currentQuantity + this.quantity
-    const newAverageCost = totalCost / newQuantity
     return { newQuantity, newAverageCost }
   }
 }

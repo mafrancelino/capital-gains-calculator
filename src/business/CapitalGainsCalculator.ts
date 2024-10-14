@@ -1,102 +1,85 @@
-import { ExemptTaxStrategy } from '../tax/ExemptTaxStrategy'
-import { TaxStrategy } from '../tax/TaxStrategy'
-import { TradeOperation } from '../types/Operation'
+import { calculateNewWeightedAverageCost, calculateGrossProfit, applyAccumulatedLosses } from '../utils/tradeCalculations';
+import { TaxStrategy } from '../tax/TaxStrategy';
+import { TradeOperation } from '../types/Operation';
+import { ExemptTaxStrategy } from '../tax/ExemptTaxStrategy';
 
 interface TaxResult {
   tax: number
 }
-
 export class CapitalGainsCalculator {
-  private totalShares = 0
-  private weightedAverageCostPerShare = 0
-  private accumulatedLosses = 0
-  private readonly taxStrategy: TaxStrategy
+  private totalShares = 0;
+  private weightedAverageCostPerShare = 0;
+  private accumulatedLosses = 0;
+  private readonly taxStrategy: TaxStrategy;
 
   constructor(taxStrategy: TaxStrategy = new ExemptTaxStrategy()) {
-    this.taxStrategy = taxStrategy
+    this.taxStrategy = taxStrategy;
   }
 
-  public handleOperation(operation: TradeOperation): TaxResult {
-    switch (operation.operation) {
-      case 'buy':
-        return this.handleBuyOperation(operation)
-      case 'sell':
-        return this.handleSellOperation(operation)
-      default:
-        throw new Error('Operação inválida')
+  // Nova função para processar uma lista de operações
+  public handleOperations(operations: TradeOperation[]): TaxResult[] {
+    return operations.map(operation => this.handleOperation(operation));
+  }
+
+  // Processa uma operação individual
+  private handleOperation(operation: TradeOperation): TaxResult {
+    if (operation.operation === 'buy') {
+      return this.handleBuyOperation(operation);
+    } 
+    if (operation.operation === 'sell') {
+      return this.handleSellOperation(operation);
     }
+
+    throw new Error('Invalid operation');
   }
 
   private handleBuyOperation(operation: TradeOperation): TaxResult {
-    this.updateWeightedAverageCost(operation)
-    this.totalShares += operation.quantity
-    return { tax: 0 }
-  }
+    this.weightedAverageCostPerShare = calculateNewWeightedAverageCost(
+      this.totalShares,
+      this.weightedAverageCostPerShare,
+      operation.quantity,
+      operation['unit-cost']
+    );
+    this.totalShares += operation.quantity;
 
-  private updateWeightedAverageCost(operation: TradeOperation): void {
-    const totalCostOfCurrentShares = this.weightedAverageCostPerShare * this.totalShares
-    const totalCostOfNewShares = operation.unitCost * operation.quantity
-    const totalSharesAfterPurchase = this.totalShares + operation.quantity
-
-    this.weightedAverageCostPerShare = (totalCostOfCurrentShares + totalCostOfNewShares) / totalSharesAfterPurchase
+    return { tax: 0 };
   }
 
   private handleSellOperation(operation: TradeOperation): TaxResult {
-    this.verifySufficientShares(operation.quantity)
+    this.verifySufficientShares(operation.quantity);
 
-    const grossProfit = this.calculateGrossProfit(operation)
-    const netProfit = this.calculateNetProfitAfterLosses(grossProfit)
-    const tax = this.computeTaxIfApplicable(netProfit, operation)
+    const grossProfit = calculateGrossProfit(
+      operation['unit-cost'],
+      this.weightedAverageCostPerShare,
+      operation.quantity
+    );
 
-    this.reduceSharesAfterSale(operation.quantity)
+    const { netProfit, remainingLosses } = applyAccumulatedLosses(grossProfit, this.accumulatedLosses);
+    this.accumulatedLosses = remainingLosses;
 
-    return { tax }
+    const tax = this.computeTaxIfApplicable(netProfit, operation);
+
+    this.reduceSharesAfterSale(operation.quantity);
+
+    return { tax };
   }
 
   private verifySufficientShares(quantity: number): void {
     if (this.totalShares < quantity) {
-      throw new Error(`Insufficient quantity of shares. Attempted to sell: ${quantity}, available: ${this.totalShares}`)
+      console.error(`Error: Insufficient shares. Attempt to sell ${quantity}, available: ${this.totalShares}`);
+      throw new Error(`Insufficient shares. Attempt to sell ${quantity}, available: ${this.totalShares}`);
     }
   }
 
   private reduceSharesAfterSale(quantity: number): void {
-    this.totalShares -= quantity
-  }
-
-  private calculateGrossProfit(operation: TradeOperation): number {
-    return (operation.unitCost - this.weightedAverageCostPerShare) * operation.quantity
-  }
-
-  private calculateNetProfitAfterLosses(grossProfit: number): number {
-    if (this.accumulatedLosses > 0) {
-      grossProfit = this.applyAccumulatedLosses(grossProfit)
-    }
-
-    if (grossProfit < 0) {
-      this.accumulateLoss(grossProfit)
-      return 0
-    }
-
-    return grossProfit
-  }
-
-  private applyAccumulatedLosses(grossProfit: number): number {
-    const adjustedProfit = grossProfit - this.accumulatedLosses
-    this.accumulatedLosses = Math.max(0, -adjustedProfit)
-    return adjustedProfit
-  }
-
-  private accumulateLoss(loss: number): void {
-    this.accumulatedLosses += Math.abs(loss)
+    this.totalShares -= quantity;
   }
 
   private computeTaxIfApplicable(netProfit: number, operation: TradeOperation): number {
-    const totalSaleValue = operation.unitCost * operation.quantity
-
+    const totalSaleValue = operation['unit-cost'] * operation.quantity;
     if (totalSaleValue <= 20000) {
-      return 0
+      return 0;
     }
-
-    return this.taxStrategy.calculateTax(netProfit, totalSaleValue)
+    return this.taxStrategy.calculateTax(netProfit, totalSaleValue);
   }
 }
