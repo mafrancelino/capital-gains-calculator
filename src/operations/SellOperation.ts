@@ -12,7 +12,6 @@ export class SellOperation implements TradeOperation {
     this.unitCost = unitCost
   }
 
-  // Delegar o cálculo para uma função pura
   execute(currentQuantity: number, currentAverageCost: number): { newQuantity: number, profit: number } {
     const profit = calculateGrossProfit(this.unitCost, currentAverageCost, this.quantity)
     const newQuantity = currentQuantity - this.quantity

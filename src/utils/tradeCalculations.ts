@@ -9,7 +9,6 @@ export function calculateNewWeightedAverageCost(
     const totalShares = currentShares + newShares
 
     const newAverageCost = (totalCurrentCost + totalNewCost) / totalShares
-    // Round to two decimal places
     return Math.round((newAverageCost + Number.EPSILON) * 100) / 100
 }
 
@@ -19,7 +18,6 @@ export function calculateGrossProfit(
     quantity: number
 ): number {
     const grossProfit = (unitCost - weightedAverageCost) * quantity
-    // Round to two decimal places
     return Math.round((grossProfit + Number.EPSILON) * 100) / 100
 }
 
