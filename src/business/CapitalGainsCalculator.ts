@@ -2,6 +2,7 @@ import { calculateNewWeightedAverageCost, calculateGrossProfit, applyAccumulated
 import { TaxStrategy } from '../tax/TaxStrategy'
 import { TaxResult, TradeOperation } from '../types/Operation'
 import { ExemptTaxStrategy } from '../tax/ExemptTaxStrategy'
+import { OperationFactory } from '../operations/OperationFactory'
 
 export class CapitalGainsCalculator {
   private totalShares = 0
@@ -14,13 +15,7 @@ export class CapitalGainsCalculator {
   }
 
   public handleOperations(trades: TradeOperation[]): TaxResult[] {
-    const transformedTrades = trades.map(trade => ({
-      ...trade,
-      unitCost: trade['unit-cost'] || trade.unitCost, 
-      quantity: trade.quantity,
-      operation: trade.operation,
-    }))
-  
+    const transformedTrades = trades.map(trade => OperationFactory.create(trade))
     return transformedTrades.map(trade => this.handleTrade(trade))
   }
   
@@ -58,7 +53,8 @@ export class CapitalGainsCalculator {
     const { netProfit, remainingLosses } = applyAccumulatedLosses(grossProfit, this.accumulatedLosses);
     this.accumulatedLosses = remainingLosses;
   
-    const tax = this.computeTaxIfApplicable(netProfit, trade);
+    const totalSaleValue = trade.unitCost * trade.quantity
+    const tax = this.taxStrategy.calculateTax(netProfit, totalSaleValue)
   
     this.reduceSharesAfterSale(trade.quantity);
     return { tax };
@@ -72,16 +68,5 @@ export class CapitalGainsCalculator {
 
   private reduceSharesAfterSale(quantity: number): void {
     this.totalShares -= quantity
-  }
-
-  private computeTaxIfApplicable(netProfit: number, trade: TradeOperation): number {
-    const totalSaleValue = trade['unit-cost'] * trade.quantity
-    
-    if (totalSaleValue <= 20000) {
-        return 0
-    }
-
-    const tax = netProfit > 0 ? netProfit * 0.20 : 0
-    return tax
   }
 }
