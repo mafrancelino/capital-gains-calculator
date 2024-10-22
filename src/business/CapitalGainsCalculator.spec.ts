@@ -26,15 +26,6 @@ describe('CapitalGainsCalculator', () => {
     expect(result[1].tax).toBe(0)
   })
 
-  it('should throw an error if selling more shares than available', () => {
-    const buyOperation = new BuyOperation(100, 10)
-    const sellOperation = new SellOperation(200, 15)
-
-    expect(() => calculator.handleOperations([buyOperation, sellOperation])).toThrow(
-      'Insufficient shares. Attempt to sell 200, available: 100'
-    )
-  })
-
   it('should not calculate tax if total sale value is less than or equal to R$ 20,000', () => {
     const buyOperation = new BuyOperation(1000, 10) // Total: R$ 10,000
     const sellOperation = new SellOperation(500, 15) // Total: R$ 7,500

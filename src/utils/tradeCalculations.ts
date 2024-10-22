@@ -1,3 +1,4 @@
+// custo médio ponderado
 export function calculateNewWeightedAverageCost(
     currentShares: number,
     currentWeightedCost: number,
@@ -12,6 +13,7 @@ export function calculateNewWeightedAverageCost(
     return Math.round((newAverageCost + Number.EPSILON) * 100) / 100
 }
 
+//lucro bruto de uma venda de ações
 export function calculateGrossProfit(
     unitCost: number,
     weightedAverageCost: number,
@@ -21,6 +23,7 @@ export function calculateGrossProfit(
     return Math.round((grossProfit + Number.EPSILON) * 100) / 100
 }
 
+//Ajustar o lucro bruto levando em consideração as perdas acumuladas do usuário.
 export function applyAccumulatedLosses(
     grossProfit: number,
     accumulatedLosses: number
