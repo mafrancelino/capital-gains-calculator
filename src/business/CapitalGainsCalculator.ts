@@ -1,8 +1,8 @@
-import { calculateNewWeightedAverageCost, calculateGrossProfit, applyAccumulatedLosses } from '../utils/tradeCalculations'
 import { TaxStrategy } from '../tax/TaxStrategy'
 import { TaxResult, TradeOperation } from '../types/Operation'
 import { ExemptTaxStrategy } from '../tax/ExemptTaxStrategy'
-import { OperationFactory } from '../operations/OperationFactory'
+import { OperationFactory } from '../operations/OperationFactory' 
+import { applyAccumulatedLosses } from '../utils/tradeCalculations'
 
 export class CapitalGainsCalculator {
   private totalShares = 0
@@ -15,10 +15,10 @@ export class CapitalGainsCalculator {
   }
 
   public handleOperations(trades: TradeOperation[]): TaxResult[] {
-    const transformedTrades = trades.map(trade => OperationFactory.create(trade))
-    return transformedTrades.map(trade => this.handleTrade(trade))
+    const transformedTrades = trades.map(trade => OperationFactory.create(trade));
+    return transformedTrades.map(trade => this.handleTrade(trade));
   }
-  
+
   private handleTrade(trade: TradeOperation): TaxResult {
     switch (trade.operation) {
       case 'buy':
@@ -31,42 +31,32 @@ export class CapitalGainsCalculator {
   }
 
   private handleBuyTrade(trade: TradeOperation): TaxResult {
-    this.weightedAverageCostPerShare = calculateNewWeightedAverageCost(
-      this.totalShares,
-      this.weightedAverageCostPerShare,
-      trade.quantity,
-      trade.unitCost
-    )
-    this.totalShares += trade.quantity
+    const { newQuantity, newAverageCost } = trade.execute(this.totalShares, this.weightedAverageCostPerShare)
+    
+    this.totalShares = newQuantity
+    this.weightedAverageCostPerShare = newAverageCost
+
     return { tax: 0 }
   }
 
   private handleSellTrade(trade: TradeOperation): TaxResult {
-    this.verifySufficientShares(trade.quantity);
-  
-    const grossProfit = calculateGrossProfit(
-      trade.unitCost,
-      this.weightedAverageCostPerShare,
-      trade.quantity
-    )
+    this.verifySufficientShares(trade.quantity)
 
-    const { netProfit, remainingLosses } = applyAccumulatedLosses(grossProfit, this.accumulatedLosses);
-    this.accumulatedLosses = remainingLosses;
-  
+    const { newQuantity, profit } = trade.execute(this.totalShares, this.weightedAverageCostPerShare)
+
+    const { netProfit, remainingLosses } = applyAccumulatedLosses(profit, this.accumulatedLosses)
+    this.accumulatedLosses = remainingLosses
+
     const totalSaleValue = trade.unitCost * trade.quantity
     const tax = this.taxStrategy.calculateTax(netProfit, totalSaleValue)
-  
-    this.reduceSharesAfterSale(trade.quantity);
-    return { tax };
+
+    this.totalShares = newQuantity
+    return { tax }
   }
-  
+
   private verifySufficientShares(quantity: number): void {
     if (this.totalShares < quantity) {
       throw new Error(`Insufficient shares. Attempt to sell ${quantity}, available: ${this.totalShares}`)
     }
-  }
-
-  private reduceSharesAfterSale(quantity: number): void {
-    this.totalShares -= quantity
   }
 }
