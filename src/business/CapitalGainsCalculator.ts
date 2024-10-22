@@ -40,20 +40,21 @@ export class CapitalGainsCalculator {
   }
 
   private handleSellTrade(trade: TradeOperation): TaxResult {
-    this.verifySufficientShares(trade.quantity)
-
-    const { newQuantity, profit } = trade.execute(this.totalShares, this.weightedAverageCostPerShare)
-
-    const { netProfit, remainingLosses } = applyAccumulatedLosses(profit, this.accumulatedLosses)
-    this.accumulatedLosses = remainingLosses
-
-    const totalSaleValue = trade.unitCost * trade.quantity
-    const tax = this.taxStrategy.calculateTax(netProfit, totalSaleValue)
-
-    this.totalShares = newQuantity
-    return { tax }
+    this.verifySufficientShares(trade.quantity);
+  
+    const { newQuantity, profit } = trade.execute(this.totalShares, this.weightedAverageCostPerShare);
+  
+    const { netProfit, remainingLosses } = applyAccumulatedLosses(profit, this.accumulatedLosses);
+    this.accumulatedLosses = remainingLosses;
+  
+    const totalSaleValue = trade.unitCost * trade.quantity;
+    const tax = this.taxStrategy.calculateTax(netProfit, totalSaleValue);
+  
+    this.totalShares = newQuantity;
+  
+    return { tax };
   }
-
+  
   private verifySufficientShares(quantity: number): void {
     if (this.totalShares < quantity) {
       throw new Error(`Insufficient shares. Attempt to sell ${quantity}, available: ${this.totalShares}`)
