@@ -1,5 +1,5 @@
 
-# Calculadora de Ganho de Capital - Desafio Técnico Nubank
+# Calculadora de Ganho de Capital 
 
 ## Visão Geral
 
